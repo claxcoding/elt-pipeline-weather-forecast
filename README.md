@@ -192,3 +192,38 @@ pip install -r requirements.txt
 
 ```bash
 pip install -r requirements.txt
+```
+---
+
+## Future Work
+
+This project is actively being expanded to improve automation, portability, and predictive capabilities:
+
+### Orchestration
+- Add workflow orchestration with **Airflow** or **Prefect**
+- Schedule regular data updates and monitor pipeline runs
+
+### Dockerization
+- Containerize the pipeline using **Docker** for reproducible environments
+- Facilitate deployment across different machines or cloud platforms
+
+### Machine Learning
+- Integrate a lightweight ML component to generate **1-hour weather forecasts**
+- Continuously retrain and evaluate the model as new data arrives
+
+**Goal:**  
+A reproducible, automated ELT pipeline that collects, transforms, and predicts short-term weather data with minimal manual intervention.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).  
+See the LICENSE file for details.
+
+---
+
+## Acknowledgements
+
+- Thanks to public weather data providers Open Meteo for API access  
+- Inspired by best practices in ELT pipeline design and reproducible data science
