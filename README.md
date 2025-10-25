@@ -1,7 +1,7 @@
 
 # 🌦️ Weather Forecasting ELT Pipeline
 
-This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using Python and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
+This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using Google Colab Python and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future there may be a deeper work on more complex machine learning model, but for now it serves the purpose for understanding the pipeline.
 Data is sourced from the **Open-Meteo API** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
@@ -77,8 +77,8 @@ weather-forecasting-elt/
 ## Usage Guide
 
 ### 1. Set your Google Cloud Project ID
-- Before running the notebook, open elt_pipeline_weather.ipynb and locate the configuration dictionary (usually config_data).
-- Replace the "project_id" value with your own Google Cloud project ID and "dataset_month" to the current month, for example:
+- Before running the notebook, open `elt_pipeline_weather.ipynb` and locate the configuration dictionary.
+- Replace the `project_id` value with your own Google Cloud project ID and `dataset_month` to the current month, for example:
 
 ```python
 config_data = {
@@ -101,13 +101,13 @@ config_data = {
 - Store prediction results back into BigQuery.
 
 ### 3. Provide Month Input for Prediction
-#### After initial setup and data loading, you will be prompted to enter an integer between 1 and 12 representing the month to run predictions for.
+After initial setup and data loading, you will be prompted to enter an integer between 1 and 12 representing the month to run predictions for.
 #### Example prompt:
 ```Enter the month number (1-12) for prediction:```
 
 
 ### 4. View Results
-#### After completion, explore the predictions stored in your BigQuery dataset or extend the project with visualization tools.
+After completion, explore the predictions stored in your BigQuery dataset or extend the project with visualization tools.
 
 ---
 
