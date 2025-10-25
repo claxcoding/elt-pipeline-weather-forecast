@@ -50,7 +50,7 @@ weather-forecasting-elt/
 ## ELT Process
 
 ### 1. Extract
-- Fetches hourly weather data (2017–2024) and current conditions using Open-Meteo's REST API.
+- Fetches historical weather data (2017–2024) and current conditions using Open-Meteo's REST API.
 - Stores raw JSON responses in memory and converts them to structured Pandas DataFrames.
 
 ### 2. Load
