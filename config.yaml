@@ -1,0 +1,43 @@
+api_current:
+  elt_weather_table_current: https://api.open-meteo.com/v1/forecast?latitude=50.79086&longitude=7.2064056&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+api_historical:
+  elt_weather_table_historical_siegburg_2017: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2017-01-01&end_date=2017-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2018: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2018-01-01&end_date=2018-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2019: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2019-01-01&end_date=2019-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2020: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2020-01-01&end_date=2020-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2021: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2021-01-01&end_date=2021-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2022: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2022-01-01&end_date=2022-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2023: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2023-01-01&end_date=2023-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+  elt_weather_table_historical_siegburg_2024: https://archive-api.open-meteo.com/v1/archive?latitude=50.79086&longitude=7.2064056&start_date=2024-01-01&end_date=2024-12-31&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation&timezone=Europe%2FBerlin
+params_current:
+  current:
+  - temperature_2m
+  - relative_humidity_2m
+  - windspeed_10m
+  - winddirection_10m
+  - precipitation
+  - surface_pressure
+  end_date: '2017-12-31'
+  latitude: 50.79086
+  longitude: 7.2064056
+  start_date: '2017-01-01'
+  timezone: Europe/Berlin
+params_historical:
+  end_date: '2017-12-31'
+  hourly:
+  - temperature_2m
+  - relative_humidity_2m
+  - precipitation
+  - wind_speed_10m
+  - wind_direction_10m
+  latitude: 50.79086
+  longitude: 7.2064056
+  start_date: '2017-01-01'
+  timezone: Europe/Berlin
+project:
+  dataset_historical: elt_weather_dataset_historical_siegburg_2017_2024
+  dataset_month: elt_weather_dataset_siegburg_october_2025
+  dataset_prediction: elt_weather_dataset_prediction_siegburg_october_2025
+  project_id: elt-siegburg-weather-forecast
+  table_8h: elt_weather_8h_table_{timestamp}
+  table_historical: elt_weather_table_historical_siegburg_2017

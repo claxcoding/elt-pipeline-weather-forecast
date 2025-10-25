@@ -1,0 +1,10 @@
+
+google-colab
+PyYAML
+google-cloud-bigquery
+requests
+requests_cache
+retry-requests
+pandas
+scikit-learn
+matplotlib
