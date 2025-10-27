@@ -20,6 +20,18 @@ The pipeline performs the following high-level steps:
 
 ---
 
+## Tools and Technologies Used
+
+- **Google Colab**: This project is developed and run in **Google Colab**, which provides an interactive environment for writing and executing Python code. It's an excellent tool for experimenting with data, visualizations, and machine learning models.
+- **Google BigQuery**: We use **Google BigQuery** to store and query large datasets efficiently. The weather data is stored in BigQuery tables, partitioned by year, and used for analysis and forecasting.
+- **Google Cloud Platform**: This project also leverages **Google Cloud Platform** services, including BigQuery for data storage, and other cloud tools to streamline the pipeline. 
+
+This combination of tools ensures an efficient, scalable, and cloud-native approach to building the weather forecasting pipeline.
+
+For data retrieval, the project uses the **[Open-Meteo API](https://open-meteo.com/)**, which provides weather forecasts for different geographical regions.
+
+---
+
 ## Attribution for Weather Data
 
 This project uses weather data provided by [Open-Meteo.com](https://open-meteo.com), which is offered under the [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license.
@@ -164,26 +176,6 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-## Key Modules
-
-### `gcp_utils/`
-- `create_dataset.py` – Create BigQuery datasets
-- `create_table.py` – Create BigQuery tables
-- `jobtables.py` – Submit query jobs to BigQuery
-- `manage_gcp.py` – CLI runner for GCP utilities
-
-### `weather_pipeline/`
-- `fetch_utils.py` – Handle API requests and data formatting
-- `load.py` – Load Pandas DataFrames to BigQuery
-- `load_config.py` – Read config from YAML file
-- `main.py` – Central runner script for the pipeline
-- `predictor_utils.py` – Train and evaluate prediction models
-- `query_utils.py` – Construct and run SQL queries
-- `transform_utils.py` – Feature engineering and cleaning
-- `visualization_utils.py` – Plotting and metrics
 
 ---
 

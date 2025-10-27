@@ -20,3 +20,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+---
+
+### Acknowledgments
+
+This project utilizes the following platforms and services:
+- **Google Colab**: For interactive development, coding, and experimentation.
+- **Google Cloud Platform (BigQuery)**: For data storage and processing.
+- **Open-Meteo API**: For fetching weather data.
