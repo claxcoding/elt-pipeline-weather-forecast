@@ -168,27 +168,6 @@ pip install -r requirements.txt
 
 ---
 
-## Configuration
-
-- `config.yaml`: Central configuration file for setting:
-  - API parameters
-  - BigQuery dataset/table names
-  - ML model settings
-
----
-
-## Requirements
-
-- Python 3.7+
-- Google Cloud credentials (service account with BigQuery permissions)
-- Jupyter Notebook or Google Colab
-- Install dependencies via:
-
-```bash
-pip install -r requirements.txt
-```
----
-
 ## Future Work
 
 This project is actively being expanded to improve automation, portability, and predictive capabilities:
