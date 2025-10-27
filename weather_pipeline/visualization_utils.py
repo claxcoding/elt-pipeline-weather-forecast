@@ -19,6 +19,7 @@ def visualize_current_prediction(df_trans_current, pred_temp):
     plt.xticks(rotation=45)
     plt.grid(axis='y')
     plt.tight_layout()
+    plt.figtext(0.99, 0.01, 'Weather data provided by Open-Meteo.com (CC BY 4.0)', ha='right', va='bottom', fontsize=8, color='gray')
     plt.show()
 
     # Show predicted temperature as a separate bar
@@ -43,4 +44,5 @@ def plot_predictions_over_time(dates, actual, predicted):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
+    plt.figtext(0.99, 0.01, 'Weather data provided by Open-Meteo.com (CC BY 4.0)', ha='right', va='bottom', fontsize=8, color='gray')
     plt.show()

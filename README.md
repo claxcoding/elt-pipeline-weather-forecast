@@ -37,7 +37,7 @@ For more information, refer to the [Open-Meteo Terms of Service](https://open-me
 <a href="https://open-meteo.com/">
 	Weather data by Open-Meteo.com
 </a>
-
+```
 ---
 
 ## Project Structure
