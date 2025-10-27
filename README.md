@@ -3,7 +3,7 @@
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future there may be a deeper work on more complex machine learning model, but for now it serves the purpose for understanding the pipeline.
-Data is sourced from the **Open-Meteo API** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
+Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
 ---
 
