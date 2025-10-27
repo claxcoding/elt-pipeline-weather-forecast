@@ -3,6 +3,7 @@
 import time
 import pandas as pd
 import numpy as np
+import datetime
 from google.cloud import bigquery
 
 def load_to_bigquery_raw(data, project_id, dataset, table):
@@ -62,3 +63,8 @@ def numpy_to_dataframe(np_array):
         return pd.DataFrame(np_array, columns=["prediction"])
     else:
         raise ValueError("Only 1D or 2D NumPy arrays are supported.")
+
+# Function to fetch current month's number
+def current_month():
+    current_date = datetime.datetime.now()
+    return current_date.month

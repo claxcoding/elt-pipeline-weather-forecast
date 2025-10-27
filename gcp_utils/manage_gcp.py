@@ -1,6 +1,6 @@
 
-from gcp_utils.create_dataset import create_dataset
-from gcp_utils.create_table import create_table
+from create_dataset import create_dataset
+from create_table import create_table
 from load_config import load_config
 
 def main(project, dataset, table):

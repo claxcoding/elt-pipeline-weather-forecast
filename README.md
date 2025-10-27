@@ -100,13 +100,7 @@ config_data = {
 - Run transformations and train a Random Forest model,
 - Store prediction results back into BigQuery.
 
-### 3. Provide Month Input for Prediction
-After initial setup and data loading, you will be prompted to enter an integer between 1 and 12 representing the month to run predictions for.
-#### Example prompt:
-```Enter the month number (1-12) for prediction:```
-
-
-### 4. View Results
+### 3. View Results
 After completion, explore the predictions stored in your BigQuery dataset or extend the project with visualization tools.
 
 ---
@@ -122,7 +116,7 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 
 ### `weather_pipeline/`
 - `fetch_utils.py` – Handle API requests and data formatting
-- `load.py` – Load Pandas DataFrames to BigQuery
+- `load_utils.py` – Load Pandas DataFrames to BigQuery, and convert NumPy arrays to DataFrames
 - `load_config.py` – Read config from YAML file
 - `main.py` – Central runner script for the pipeline
 - `predictor_utils.py` – Train and evaluate prediction models
@@ -211,19 +205,19 @@ This project is actively being expanded to improve automation, portability, and 
 - Integrate a lightweight ML component to generate **1-hour weather forecasts**
 - Continuously retrain and evaluate the model as new data arrives
 
-**Goal:**  
+**Goal:**
 A reproducible, automated ELT pipeline that collects, transforms, and predicts short-term weather data with minimal manual intervention.
 
 ---
 
 ## License
 
-- This project is licensed under the [MIT License](LICENSE).  
+- This project is licensed under the [MIT License](LICENSE).
 - See the LICENSE file for details.
 
 ---
 
 ## Acknowledgements
 
-- Thanks to public weather data providers Open Meteo for API access  
+- Thanks to public weather data providers Open Meteo for API access
 - Inspired by best practices in ELT pipeline design and reproducible data science

@@ -6,8 +6,7 @@ import numpy as np
 from load_config import load_config
 from fetch_utils import api_fetch, api_fetch_url, fetch_historical_weather
 from query_utils import extract_weather_historical, extract_weather_current, extract_with_query
-from weather_pipeline.fetch_utils import fetch_historical_weather
-from load_utils import load_to_bigquery_raw, load_to_bigquery, numpy_to_dataframe
+from load_utils import load_to_bigquery_raw, load_to_bigquery, numpy_to_dataframe, current_month
 from transform_utils import transform_data
 from predictor_utils import train_model, predict_current
 from sklearn.metrics import mean_absolute_error
@@ -94,29 +93,27 @@ def main(project_id, dataset_historical, table_historical, dataset_month, table_
     load_to_bigquery_raw(df_current, project_id, dataset_month, table_id_8h_current)
     print(">>> Loading ends")
 
-    # Ask user for a month number (e.g., 10 for October)
-    month_input = input("Enter the month number (1-12) you want to extract data for: ")
+    # Get the current month
+    month_input = current_month()
+    print(f"Current month: {month_input}")
 
     # Extract historical weather data from BigQuery and format to DataFrame
     print(f">>> Extracting historical data from BigQuery for the month {month_input}")
 
-    # Validate and convert to integer
-    try:
-        month = int(month_input)
-        if not 1 <= month <= 12:
-            raise ValueError
-    except ValueError:
-        raise ValueError("Invalid month. Please enter a number between 1 and 12.")
-
+    # Load historical data from BigQuery for the current month
     df_historical = []
     for year in range(2017, 2025):
         table = f"elt_weather_table_historical_siegburg_{year}"
+
+        # Create the query filter as a string with month filter
+        filter_condition = f"EXTRACT(MONTH FROM PARSE_TIMESTAMP('%Y-%m-%dT%H:%M', time)) = {month_input}"
+
         df = extract_with_query(
             project_id=project_id,
             dataset=dataset_historical,
             table=table,
             # Use PARSE_TIMESTAMP to convert the string 'time' to a timestamp before extracting the month
-            filters=["EXTRACT(MONTH FROM PARSE_TIMESTAMP('%Y-%m-%dT%H:%M', time)) = 10"]
+            filters=[filter_condition]  # Pass the filter condition as a list of strings
         )
         df_historical.append(df)
 
