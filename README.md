@@ -34,7 +34,9 @@ For more information, refer to the [Open-Meteo Terms of Service](https://open-me
 
 **Example attribution (HTML for display in web or applications):**
 ```html
-<a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
+<a href="https://open-meteo.com/">
+	Weather data by Open-Meteo.com
+</a>
 
 ---
 
