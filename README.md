@@ -2,7 +2,8 @@
 # 🌦️ Weather Forecasting ELT Pipeline
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
-The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future there may be a deeper work on more complex machine learning model, but for now it serves the purpose for understanding the pipeline.
+
+The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of understanding the pipeline.  
 Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
 ---
@@ -17,7 +18,23 @@ The pipeline performs the following high-level steps:
 4. **Predict** hourly temperatures using a **Random Forest** regression model.
 5. **Store** the predictions back to BigQuery.
 
-The project is implemented in **modular Python scripts** that can be run via a Jupyter/Colab notebook or as CLI scripts. It is designed to be extended with orchestration, Dockerization, and more advanced modeling.
+---
+
+## Attribution for Weather Data
+
+This project uses weather data provided by [Open-Meteo.com](https://open-meteo.com), which is offered under the [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license.
+
+You are free to copy, redistribute, and adapt the data, but please ensure proper attribution:
+
+- **Credit**: "Weather data by Open-Meteo.com"
+- **Link**: [Open-Meteo.com](https://open-meteo.com)
+- **Changes**: If you make changes to the data, you must indicate that modifications were made.
+
+For more information, refer to the [Open-Meteo Terms of Service](https://open-meteo.com/en/terms).
+
+**Example attribution (HTML for display in web or applications):**
+```html
+<a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
 
 ---
 
