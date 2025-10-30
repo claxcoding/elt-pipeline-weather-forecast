@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from load_config import load_config
 from fetch_utils import api_fetch, api_fetch_url, fetch_historical_weather
-from query_utils import extract_weather_historical, extract_weather_current, extract_with_query
+from query_utils import extract_weather_current, extract_full_query
 from load_utils import load_to_bigquery_raw, load_to_bigquery, numpy_to_dataframe, current_month
 from transform_utils import transform_data
 from predictor_utils import train_model, predict_current
@@ -93,35 +93,62 @@ def main(project_id, dataset_historical, table_historical, dataset_month, table_
     load_to_bigquery_raw(df_current, project_id, dataset_month, table_id_8h_current)
     print(">>> Loading ends")
 
-    # Get the current month
-    month_input = current_month()
-    print(f"Current month: {month_input}")
+    # # Get the current month (for future seasonal predictions)
+    # month_input = current_month()
+    # print(f"Current month: {month_input}")
 
-    # Extract historical weather data from BigQuery and format to DataFrame
-    print(f">>> Extracting historical data from BigQuery for the month {month_input}")
+    # # Extract historical weather data from BigQuery and format to DataFrame (for future seasonal predictions)
+    # print(f">>> Extracting historical data from BigQuery for the month {month_input}")
 
     # Load historical data from BigQuery for the current month
+    # month_input = 1  # Example: January (for future seasonal predictions)
+
     df_historical = []
+
+    # The following code loops through yearly historical BigQuery tables, runs a SELECT that pulls several weather columns and computes 1-step past values (LAG)
+    # and a 1-step future target (LEAD), collects the returned pandas DataFrames, concatenates them into one large DataFrame,
+    # and drops rows with any missing values (which removes rows with NULL lag/lead)
+
     for year in range(2017, 2025):
         table = f"elt_weather_table_historical_siegburg_{year}"
+        query = f'''
+        SELECT
+            time,
+            temperature_2m AS temp,
+            relative_humidity_2m AS rel_humidity,
+            surface_pressure AS pressure,
+            wind_speed_10m AS wind_speed,
+            wind_direction_10m AS wind_direction,
+            precipitation AS precip,
 
-        # Create the query filter as a string with month filter
-        filter_condition = f"EXTRACT(MONTH FROM PARSE_TIMESTAMP('%Y-%m-%dT%H:%M', time)) = {month_input}"
+            # These lines use SQL window functions — LAG(column, 1) OVER (ORDER BY time) returns the
+            # column value from the previous row when rows are ordered by time.
+            # Each LAG(...,1) gives the immediate past observation for that metric
 
-        df = extract_with_query(
-            project_id=project_id,
-            dataset=dataset_historical,
-            table=table,
-            # Use PARSE_TIMESTAMP to convert the string 'time' to a timestamp before extracting the month
-            filters=[filter_condition]  # Pass the filter condition as a list of strings
-        )
-        df_historical.append(df)
+            LAG(temperature_2m, 1) OVER (ORDER BY time) AS lag_temp_1,
+            LAG(relative_humidity_2m, 1) OVER (ORDER BY time) AS lag_rel_humidity_1,
+            LAG(surface_pressure, 1) OVER (ORDER BY time) AS lag_pressure_1,
+            LAG(wind_speed_10m, 1) OVER (ORDER BY time) AS lag_wind_speed_1,
+            LAG(wind_direction_10m, 1) OVER (ORDER BY time) AS lag_wind_direction_1,
+            LAG(precipitation, 1) OVER (ORDER BY time) AS lag_precip_1,
 
-    df_historical = pd.concat(df_historical, ignore_index=True)
+            LEAD(temperature_2m, 1) OVER (ORDER BY time) AS temp_future
 
-    print("Historical data from BigQuery:")
+        FROM `{project_id}.{dataset_historical}.{table}`
+        '''
+
+        df = extract_full_query(query, project_id)
+        if not df.empty:
+            df_historical.append(df)
+        else:
+            print(f"No data found for year {year}.")
+
+    if df_historical:
+        df_historical = pd.concat(df_historical, ignore_index=True)
+        df_historical.dropna(inplace=True)  # Remove rows where lag/lead = NULL
+
     print(df_historical.head())
-    print(f"Total rows from October: {len(df_historical)}")
+    print(f"Total rows historical data: {len(df_historical)}")
 
     # Extract current weather data from BigQuery and format into DataFrame
     print(">>> Extracting current data from BigQuery")

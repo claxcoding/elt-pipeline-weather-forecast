@@ -3,7 +3,7 @@
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 
-The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of understanding the pipeline.  
+The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of understanding the pipeline.
 Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
 ---
@@ -22,9 +22,9 @@ The pipeline performs the following high-level steps:
 
 ## Tools and Technologies Used
 
-- **Google Colab**: This project is developed and run in **Google Colab**, which provides an interactive environment for writing and executing Python code. It's an excellent tool for experimenting with data, visualizations, and machine learning models.
-- **Google BigQuery**: We use **Google BigQuery** to store and query large datasets efficiently. The weather data is stored in BigQuery tables, partitioned by year, and used for analysis and forecasting.
-- **Google Cloud Platform**: This project also leverages **Google Cloud Platform** services, including BigQuery for data storage, and other cloud tools to streamline the pipeline. 
+- **Google Colab**: Interactive environment for development, experimentation, and running Python code.
+- **Google Cloud Platform (GCP)**: Provides the cloud infrastructure for this project, including **BigQuery** for storing and querying large weather datasets.
+
 
 This combination of tools ensures an efficient, scalable, and cloud-native approach to building the weather forecasting pipeline.
 
@@ -184,7 +184,7 @@ pip install -r requirements.txt
 This project is actively being expanded to improve automation, portability, and predictive capabilities:
 
 ### Orchestration
-- Add workflow orchestration with **Airflow** or **Prefect**
+- Add workflow orchestration with **Airflow**
 - Schedule regular data updates and monitor pipeline runs
 
 ### Dockerization
