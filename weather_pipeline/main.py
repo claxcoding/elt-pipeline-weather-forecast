@@ -3,6 +3,7 @@ import yaml
 import json
 import pandas as pd
 import numpy as np
+import datetime
 from load_config import load_config
 from fetch_utils import api_fetch, api_fetch_url, fetch_historical_weather
 from query_utils import extract_weather_current, extract_full_query
@@ -103,52 +104,123 @@ def main(project_id, dataset_historical, table_historical, dataset_month, table_
     # Load historical data from BigQuery for the current month
     # month_input = 1  # Example: January (for future seasonal predictions)
 
-    df_historical = []
+    # -------------------------------------------------------------------------
+    # Automatically determine the "seasonal window" of months to include in the
+    # historical dataset based on the current month. This allows the model to
+    # only use data from months that are relevant to the time of year being
+    # predicted (e.g., if we are predicting in October, we include September,
+    # October, and November data from past years).
+    #
+    # Steps:
+    # 1. Get the current date and time using datetime.now().
+    # 2. Extract the current month (1-12) from the current date.
+    # 3. Define a seasonal window as ±1 month around the current month.
+    #    - Use modulo arithmetic to correctly wrap around the year (e.g., if
+    #      current month is January, the window includes December of previous
+    #      year, January, and February).
+    # 4. This 'season_months' list is later used to filter the historical data
+    #    so that only rows where df['month'] is in this list are included.
+    # -------------------------------------------------------------------------
 
-    # The following code loops through yearly historical BigQuery tables, runs a SELECT that pulls several weather columns and computes 1-step past values (LAG)
-    # and a 1-step future target (LEAD), collects the returned pandas DataFrames, concatenates them into one large DataFrame,
-    # and drops rows with any missing values (which removes rows with NULL lag/lead)
+    # Automatically get the current month
+    current_time = datetime.datetime.now()
+    target_month = current_time.month
+    print(f"Detected current month: {target_month}")
+
+    # Define a ±1 month seasonal window
+    season_months = [(target_month - 1) % 12 or 12,
+                    target_month,
+                    (target_month + 1 - 1) % 12 + 1]
+    print(f"Using seasonal months: {season_months}")
+
+    df_historical = []
 
     for year in range(2017, 2025):
         table = f"elt_weather_table_historical_siegburg_{year}"
+
         query = f'''
         SELECT
-            time,
-            temperature_2m AS temp,
-            relative_humidity_2m AS rel_humidity,
-            surface_pressure AS pressure,
-            wind_speed_10m AS wind_speed,
-            wind_direction_10m AS wind_direction,
-            precipitation AS precip,
+          time,
+          temperature_2m AS temp,
+          relative_humidity_2m AS rel_humidity,
+          surface_pressure AS pressure,
+          wind_speed_10m AS wind_speed,
+          wind_direction_10m AS wind_direction,
+          precipitation AS precip,
 
-            # These lines use SQL window functions — LAG(column, 1) OVER (ORDER BY time) returns the
-            # column value from the previous row when rows are ordered by time.
-            # Each LAG(...,1) gives the immediate past observation for that metric
+          -- Temperature lags
+          LAG(temperature_2m, 1) OVER (ORDER BY time) AS lag_temp_1h,
+          LAG(temperature_2m, 2) OVER (ORDER BY time) AS lag_temp_2h,
+          LAG(temperature_2m, 3) OVER (ORDER BY time) AS lag_temp_3h,
 
-            LAG(temperature_2m, 1) OVER (ORDER BY time) AS lag_temp_1,
-            LAG(relative_humidity_2m, 1) OVER (ORDER BY time) AS lag_rel_humidity_1,
-            LAG(surface_pressure, 1) OVER (ORDER BY time) AS lag_pressure_1,
-            LAG(wind_speed_10m, 1) OVER (ORDER BY time) AS lag_wind_speed_1,
-            LAG(wind_direction_10m, 1) OVER (ORDER BY time) AS lag_wind_direction_1,
-            LAG(precipitation, 1) OVER (ORDER BY time) AS lag_precip_1,
+          -- Humidity lags
+          LAG(relative_humidity_2m, 1) OVER (ORDER BY time) AS lag_rel_humidity_1h,
+          LAG(relative_humidity_2m, 2) OVER (ORDER BY time) AS lag_rel_humidity_2h,
+          LAG(relative_humidity_2m, 3) OVER (ORDER BY time) AS lag_rel_humidity_3h,
 
-            LEAD(temperature_2m, 1) OVER (ORDER BY time) AS temp_future
+          -- Pressure lags
+          LAG(surface_pressure, 1) OVER (ORDER BY time) AS lag_pressure_1h,
+          LAG(surface_pressure, 2) OVER (ORDER BY time) AS lag_pressure_2h,
+          LAG(surface_pressure, 3) OVER (ORDER BY time) AS lag_pressure_3h,
+
+          -- Wind speed lags
+          LAG(wind_speed_10m, 1) OVER (ORDER BY time) AS lag_wind_speed_1h,
+          LAG(wind_speed_10m, 2) OVER (ORDER BY time) AS lag_wind_speed_2h,
+          LAG(wind_speed_10m, 3) OVER (ORDER BY time) AS lag_wind_speed_3h,
+
+          -- Wind direction lags
+          LAG(wind_direction_10m, 1) OVER (ORDER BY time) AS lag_wind_direction_1h,
+          LAG(wind_direction_10m, 2) OVER (ORDER BY time) AS lag_wind_direction_2h,
+          LAG(wind_direction_10m, 3) OVER (ORDER BY time) AS lag_wind_direction_3h,
+
+          -- Precipitation lags
+          LAG(precipitation, 1) OVER (ORDER BY time) AS lag_precip_1h,
+          LAG(precipitation, 2) OVER (ORDER BY time) AS lag_precip_2h,
+          LAG(precipitation, 3) OVER (ORDER BY time) AS lag_precip_3h
 
         FROM `{project_id}.{dataset_historical}.{table}`
         '''
 
         df = extract_full_query(query, project_id)
+
         if not df.empty:
+            df['time'] = pd.to_datetime(df['time'])
+            df['month'] = df['time'].dt.month
+
+            # Filter data to ±1 month around current time
+            df = df[df['month'].isin(season_months)]
+
+            # Add wind direction cyclical encoding
+            df['wind_dir_sin'] = np.sin(np.deg2rad(df['wind_direction']))
+            df['wind_dir_cos'] = np.cos(np.deg2rad(df['wind_direction']))
+
+            # Add diurnal cyclical encodings
+            df['hour'] = df['time'].dt.hour
+            df['sin_hour'] = np.sin(2 * np.pi * df['hour'] / 24)
+            df['cos_hour'] = np.cos(2 * np.pi * df['hour'] / 24)
+
+            # Drop rows with missing lag values
+            df.dropna(inplace=True)
+
             df_historical.append(df)
+            print(f"Loaded {len(df)} rows from {table}")
         else:
             print(f"No data found for year {year}.")
 
+    # === Combine and summarize ===
     if df_historical:
         df_historical = pd.concat(df_historical, ignore_index=True)
-        df_historical.dropna(inplace=True)  # Remove rows where lag/lead = NULL
+        print(f"Total rows after seasonal concatenation: {len(df_historical)}")
 
-    print(df_historical.head())
-    print(f"Total rows historical data: {len(df_historical)}")
+        # Optional rolling/aggregate features
+        df_historical['temp_mean_last3h'] = df_historical[['lag_temp_1h','lag_temp_2h','lag_temp_3h']].mean(axis=1)
+        df_historical['wind_speed_mean_last3h'] = df_historical[['lag_wind_speed_1h','lag_wind_speed_2h','lag_wind_speed_3h']].mean(axis=1)
+        df_historical['humidity_mean_last3h'] = df_historical[['lag_rel_humidity_1h','lag_rel_humidity_2h','lag_rel_humidity_3h']].mean(axis=1)
+
+        print(df_historical.head())
+    else:
+        print("No seasonal historical data loaded.")
+
 
     # Extract current weather data from BigQuery and format into DataFrame
     print(">>> Extracting current data from BigQuery")

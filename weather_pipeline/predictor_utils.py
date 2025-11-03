@@ -6,9 +6,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 def train_model(df_trans_historical):
 
     # Train a Random Forest model on historical weather data.
-
-    # Returns:
-    # - trained model
+    # Returns trained model
 
     features = ['rel_humidity', 'precip', 'pressure', 'wind_speed', 'wind_direction']
     target = 'temp'
