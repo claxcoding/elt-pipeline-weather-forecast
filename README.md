@@ -126,10 +126,10 @@ config_data = {
 
 ### 2. Run the Notebook
 #### Execute all cells sequentially. This will:
-- Fetch historical and current weather data,
-- Load data into BigQuery,
-- Run transformations and train a Random Forest model,
-- Store prediction results back into BigQuery.
+- Fetch historical and current weather data
+- Load data into BigQuery
+- Run transformations and train a Random Forest model
+- Store prediction results back into BigQuery
 
 ### 3. View Results
 After completion, explore the predictions stored in your BigQuery dataset or extend the project with visualization tools.
