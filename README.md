@@ -132,7 +132,8 @@ Each step is implemented as a **Prefect @task**, managed within a central **flow
 
 ### Orchestration and Visualization
 The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
-The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
+The dependency graph of the pipeline is visualized using **Graphviz**. The following DAG shows the Prefect-orchestrated workflow of the weather forecasting pipeline:
+
 
 ---
 
@@ -174,6 +175,10 @@ Each step is implemented as a **Prefect @task**, managed within a central **flow
 ### Orchestration and Visualization
 The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
 The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
+
+<p align="center">
+  <img src="dag_weather_forecast_pipeline.png" alt="Weather Forecasting ELT Pipeline DAG" width="700"/>
+</p>
 
 ---
 
