@@ -1,9 +1,9 @@
 
 from google.cloud import bigquery
 
-def create_dataset(PROJECT_ID, dataset_id, location="EU"):
+def create_dataset(project_id, dataset_id, location="EU"):
     # Creates a BigQuery dataset if it doesn't exist.
-    client = bigquery.Client(project=PROJECT_ID)
+    client = bigquery.Client(project=project_id)
     dataset_ref = client.dataset(dataset_id)
     try:
         client.get_dataset(dataset_ref)

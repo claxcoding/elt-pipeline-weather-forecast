@@ -174,7 +174,7 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 - Install dependencies via:
 
 ```bash
-pip install -r requirements.txt
+!pip install -r /content/drive/MyDrive/elt_pipeline_weather_forecast/requirements.txt
 ```
 
 ---

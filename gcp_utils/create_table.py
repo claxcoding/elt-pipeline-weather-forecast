@@ -1,10 +1,10 @@
 
 from google.cloud import bigquery
 
-def create_table(PROJECT_ID, dataset_id, table_id):
+def create_table(project_id, dataset_id, table_id):
 
     # Creates a BigQuery table if it doesn't exist.
-    client = bigquery.Client(project=PROJECT_ID)
+    client = bigquery.Client(project=project_id)
     dataset_ref = client.dataset(dataset_id)
     table_ref = dataset_ref.table(table_id)
     try:

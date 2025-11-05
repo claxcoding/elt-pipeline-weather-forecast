@@ -26,5 +26,5 @@ def main(project, dataset, table):
 
 if __name__ == "__main__":
     # You can provide default values here, or leave it empty
-    main("etl-weather-467607", "dataset", "table")
+    main("project_id", "dataset", "table")
 
