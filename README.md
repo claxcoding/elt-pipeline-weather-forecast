@@ -3,7 +3,7 @@
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 
-The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of understanding the pipeline.
+The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of demonstrating a **reproducible data engineering workflow**.  
 Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
 ---
@@ -20,11 +20,26 @@ The pipeline performs the following high-level steps:
 
 ---
 
+## Orchestration
+
+The pipeline is orchestrated using **Prefect 3.5**, which allows each step to be defined as a **@task** and combined into a **flow**. Prefect manages **task dependencies, execution order, and monitoring**, ensuring that:
+
+- Extraction occurs before loading into BigQuery.
+- Transformation only runs once the required data is available.
+- Machine learning training and predictions are executed after data preparation.
+- Predictions are safely loaded into BigQuery.
+
+This orchestration makes the pipeline **modular, reproducible, and maintainable**, while providing a clear overview of the workflow through DAG visualizations.
+
+---
+
 ## Tools and Technologies Used
 
 - **Google Colab**: Interactive environment for development, experimentation, and running Python code.
 - **Google Cloud Platform (GCP)**: Provides the cloud infrastructure for this project, including **BigQuery** for storing and querying large weather datasets.
-
+- **Prefect 3.5**: Orchestration framework for defining tasks and flows, managing dependencies, and visualizing the DAG.
+- **Python Libraries**: `pandas`, `numpy`, `scikit-learn` for data processing and machine learning.
+- **Graphviz**: Visualization library used to generate DAG diagrams of the pipeline tasks.
 
 This combination of tools ensures an efficient, scalable, and cloud-native approach to building the weather forecasting pipeline.
 
@@ -50,18 +65,19 @@ For more information, refer to the [Open-Meteo Terms of Service](https://open-me
 	Weather data by Open-Meteo.com
 </a>
 ```
+
 ---
 
 ## Project Structure
 
 ```text
 weather-forecasting-elt/
-├── elt_pipeline_weather.ipynb      # Main notebook runner
-├── gcp_utils/                      # Utilities for Google Cloud (BigQuery)
+├── elt_pipeline_weather.ipynb           # Main notebook runner
+├── gcp_utils/                           # Utilities for Google Cloud (BigQuery)
 │   ├── create_dataset.py
 │   ├── create_table.py
 │   └── manage_gcp.py
-├── weather_pipeline/               # ELT and ML logic
+├── weather_pipeline/                    # ELT and ML logic
 │   ├── Dockerfile
 │   ├── fetch_utils.py
 │   ├── load.py
@@ -71,37 +87,93 @@ weather-forecasting-elt/
 │   ├── query_utils.py
 │   ├── transform_utils.py
 │   ├── visualization_utils.py
-├── config.yaml                     # Central configuration file
-├── requirements.txt                # Required packages
-└── README.md                       # This file
+├── config.yaml                          # Central configuration file
+├── dag_weather_forecast_pipeline.png    # DAG visualization of the Prefect pipeline
+├── requirements.txt                     # Required packages
+└── README.md                            # This file
 ```
 
 ---
 
 ## ELT Process
 
+This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.  
+Each step is implemented as a **Prefect @task**, managed within a central **flow**, allowing for dependency control, retry policies, and clear monitoring through DAG visualization.
+
 ### 1. Extract
-- Fetches historical weather data (2017–2024) and current conditions using Open-Meteo's REST API.
+- Fetches historical weather data (2017–2024) and current conditions using Open-Meteo’s REST API.
+- Tasks handle both **historical** and **current** API calls separately for modularity.
 - Stores raw JSON responses in memory and converts them to structured Pandas DataFrames.
+- Automatically retries API calls if temporary connection errors occur (managed by Prefect).
 
 ### 2. Load
-- Loads raw weather data into **Google BigQuery**, storing each year's data in a separate table.
-- Data is loaded using the `google-cloud-bigquery` Python client.
+- Loads raw weather data into **Google BigQuery**, storing each year’s data in a separate table.
+- Data loading is orchestrated so that BigQuery tables are created before loading occurs.
+- Uses the `google-cloud-bigquery` Python client for seamless integration with GCP.
 
 ### 3. Transform
-- Cleans and formats the raw data.
-- Feature engineering includes:
+- Cleans and formats raw weather data into consistent schemas.
+- Performs **feature engineering** to create columns such as:
   - `temperature`, `rel_humidity`, `precipitation`, `pressure`, `wind_speed`, `wind_direction`
-- Combines historical data across multiple years (e.g., for October only).
-- Prepares the data for machine learning.
+- Merges historical and current data to prepare model-ready features.
+- Executed only after successful loading, as enforced by Prefect task dependencies.
 
 ### 4. Model (Predict)
 - Trains a **Random Forest Regressor** using historical October data.
-- Predicts hourly temperatures.
-- Evaluates and optionally visualizes prediction results.
+- Generates hourly temperature predictions for the current period.
+- The **ML Stage** sits at the center of the DAG, connecting data transformation with prediction output.
+- Prefect ensures the model only trains after all required data transformations are complete.
 
 ### 5. Store
 - Saves prediction results back to BigQuery for analytics or dashboarding.
+- Acts as the final task in the flow, marking successful pipeline completion.
+
+---
+
+### Orchestration and Visualization
+The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
+The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
+
+---
+
+## ELT Process
+
+This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.  
+Each step is implemented as a **Prefect @task**, managed within a central **flow**, allowing for dependency control, retry policies, and clear monitoring through DAG visualization.
+
+### 1. Extract
+- Fetches historical weather data (2017–2024) and current conditions using Open-Meteo’s REST API.
+- Tasks handle both **historical** and **current** API calls separately for modularity.
+- Stores raw JSON responses in memory and converts them to structured Pandas DataFrames.
+- Automatically retries API calls if temporary connection errors occur (managed by Prefect).
+
+### 2. Load
+- Loads raw weather data into **Google BigQuery**, storing each year’s data in a separate table.
+- Data loading is orchestrated so that BigQuery tables are created before loading occurs.
+- Uses the `google-cloud-bigquery` Python client for seamless integration with GCP.
+
+### 3. Transform
+- Cleans and formats raw weather data into consistent schemas.
+- Performs **feature engineering** to create columns such as:
+  - `temperature`, `rel_humidity`, `precipitation`, `pressure`, `wind_speed`, `wind_direction`
+- Merges historical and current data to prepare model-ready features.
+- Executed only after successful loading, as enforced by Prefect task dependencies.
+
+### 4. Model (Predict)
+- Trains a **Random Forest Regressor** using historical October data.
+- Generates hourly temperature predictions for the current period.
+- The **ML Stage** sits at the center of the DAG, connecting data transformation with prediction output.
+- Prefect ensures the model only trains after all required data transformations are complete.
+
+### 5. Store
+- Saves prediction results back to BigQuery for analytics or dashboarding.
+- Acts as the final task in the flow, marking successful pipeline completion.
+
+---
+
+### Orchestration and Visualization
+The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
+The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
 
 ---
 
@@ -171,7 +243,8 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 - Python 3.7+
 - Google Cloud credentials (service account with BigQuery permissions)
 - Jupyter Notebook or Google Colab
-- Install dependencies via:
+- Prefect 3.5.0
+- Dependencied are installed while running the whole Notebook:
 
 ```bash
 !pip install -r /content/drive/MyDrive/elt_pipeline_weather_forecast/requirements.txt

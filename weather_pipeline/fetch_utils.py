@@ -3,6 +3,13 @@ import requests
 import pandas as pd
 from load_config import load_config
 
+def api_fetch(url, params=None):
+    # Fetch API data with optional query parameters.
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
 def api_fetch_url(url, params=None):
 
     response = requests.get(url, params=params)

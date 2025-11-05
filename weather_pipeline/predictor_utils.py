@@ -3,11 +3,9 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 
-def train_model(df_trans_historical):
-
+def train_model(df_trans_historical):  
     # Train a Random Forest model on historical weather data.
     # Returns trained model
-
     features = ['rel_humidity', 'precip', 'pressure', 'wind_speed', 'wind_direction']
     target = 'temp'
 
@@ -20,11 +18,8 @@ def train_model(df_trans_historical):
     return model
 
 def predict_current(model, df_trans_current):
-
     # Use trained model to predict current temperature from a single or few records.
-    # Returns:
-    # - prediction(s)
-
+    # Returns prediction(s)
     features = ['rel_humidity', 'precip', 'pressure', 'wind_speed', 'wind_direction']
 
     # Make sure input is DataFrame with expected columns

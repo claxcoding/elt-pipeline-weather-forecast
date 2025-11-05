@@ -45,7 +45,7 @@ def fetch_current_task(url_current: str):
 
 
 @task
-def load_historical_to_bq(df_dict: dict, project_id: str, dataset_historical: str):
+def load_historical_to_bq_task(df_dict: dict, project_id: str, dataset_historical: str):
     for year, df in df_dict.items():
         if df.empty:
             continue
@@ -54,12 +54,12 @@ def load_historical_to_bq(df_dict: dict, project_id: str, dataset_historical: st
 
 
 @task
-def load_current_to_bq(df_current: pd.DataFrame, project_id: str, dataset_month: str, table_current: str):
+def load_current_to_bq_task(df_current: pd.DataFrame, project_id: str, dataset_month: str, table_current: str):
     load_to_bigquery_raw(df_current, project_id, dataset_month, table_current)
 
 
 @task
-def get_seasonal_historical(project_id: str, dataset_historical: str):
+def get_seasonal_historical_task(project_id: str, dataset_historical: str):
     current_time = datetime.datetime.now()
     target_month = current_time.month
     season_months = [(target_month - 1) % 12 or 12,
@@ -106,7 +106,7 @@ def get_seasonal_historical(project_id: str, dataset_historical: str):
           LAG(precipitation, 3) OVER (ORDER BY time) AS lag_precip_3h
         FROM `{project_id}.{dataset_historical}.{table}`
         '''
-        
+
         df = extract_full_query(query, project_id)
 
         if not df.empty:
@@ -132,7 +132,7 @@ def get_seasonal_historical(project_id: str, dataset_historical: str):
         else:
             print(f"No data found for year {year}.")
 
-    # Combine and summarize 
+    # Combine and summarize
     if df_historical_list:
         df_historical = pd.concat(df_historical_list, ignore_index=True)
         print(f"Total rows after seasonal concatenation: {len(df_historical)}")
@@ -141,22 +141,32 @@ def get_seasonal_historical(project_id: str, dataset_historical: str):
         df_historical['temp_mean_last3h'] = df_historical[['lag_temp_1h','lag_temp_2h','lag_temp_3h']].mean(axis=1)
         df_historical['wind_speed_mean_last3h'] = df_historical[['lag_wind_speed_1h','lag_wind_speed_2h','lag_wind_speed_3h']].mean(axis=1)
         df_historical['humidity_mean_last3h'] = df_historical[['lag_rel_humidity_1h','lag_rel_humidity_2h','lag_rel_humidity_3h']].mean(axis=1)
-        
-        print(df_historical.head())       
+
+        print(df_historical.head())
         return df_historical
     else:
         print("No seasonal historical data loaded.")
 
 
 @task
-def extract_current_from_bq(project_id: str, dataset_month: str, table_current: str):
+def extract_current_from_bq_task(project_id: str, dataset_month: str, table_current: str):
     return extract_weather_current(project_id, dataset_month, table_current)
 
 
 @task
-def train_and_predict(df_historical: pd.DataFrame, df_current: pd.DataFrame):
+def transform_historical_task(df_historical: pd.DataFrame):
     df_trans_historical = transform_data(df_historical)
+    return df_trans_historical
+
+
+@task
+def transform_current_task(df_current: pd.DataFrame):
     df_trans_current = transform_data(df_current)
+    return df_trans_current
+
+
+@task
+def train_and_predict_task(df_trans_historical: pd.DataFrame, df_trans_current: pd.DataFrame):
     model = train_model(df_trans_historical)
     pred_temp = predict_current(model, df_trans_current)
 
@@ -169,7 +179,7 @@ def train_and_predict(df_historical: pd.DataFrame, df_current: pd.DataFrame):
 
 
 @task
-def load_prediction_to_bq(pred_temp: np.ndarray, project_id: str, dataset_prediction: str, table_pred: str):
+def load_prediction_to_bq_task(pred_temp: np.ndarray, project_id: str, dataset_prediction: str, table_pred: str):
     df_pred = numpy_to_dataframe(pred_temp)
     load_to_bigquery(df_pred, project_id, dataset_prediction, table_pred)
 
@@ -192,42 +202,62 @@ def weather_pipeline_flow(config_path: str):
     url_current = config['api_current']['elt_weather_table_current']
     dataset_prediction = config['project']['dataset_prediction']
 
-    # Get timestamps
+    # Get Timestamps
     timestamp_bq = datetime.datetime.now().strftime("%Y%m%d_%H%M")
     table_current = f"elt_weather_8h_table_{timestamp_bq}"
     table_prediction = f"elt_weather_prediction_table_{timestamp_bq}"
 
-    # Create datasets and tables
-    # Loop through each table name in the list 'url_historical_2017_2014'
-    # This creates tables for each historical weather table in the BigQuery dataset.
+    # Create historical Datasets and Tables
+    # Loop through each Table Name in the List 'url_historical_2017_2014'
+    # This creates Tables for each historical Weather Table in the BigQuery Dataset.
     for n in url_historical_2017_2014:
       create_dataset_task(project_id, dataset_historical)
       create_table_task(project_id, dataset_historical, n)
 
+    # Create current Datasets and Tables
     create_dataset_task(project_id, dataset_month)
     create_table_task(project_id, dataset_month, table_current)
 
+    # Create prediction Datasets and Tables
     create_dataset_task(project_id, dataset_prediction)
     create_table_task(project_id, dataset_prediction, table_prediction)
 
-
-    # Fetch and load historical & current data
+    # Fetch and load historical & current Data
     historical_data_dict, historical_df_dict = fetch_historical_task(config)
-    load_historical_to_bq(historical_df_dict, project_id, dataset_historical)
+    load_historical_to_bq_task(historical_df_dict, project_id, dataset_historical)
 
     current_data = fetch_current_task(url_current)
     df_current = pd.DataFrame([current_data['current']])
-    load_current_to_bq(df_current, project_id, dataset_month, table_current)
+    load_current_to_bq_task(df_current, project_id, dataset_month, table_current)
 
-    # Seasonal historical + current from BQ
-    df_historical_seasonal = get_seasonal_historical(project_id, dataset_historical)
-    df_current_bq = extract_current_from_bq(project_id, dataset_month, table_current)
+    # Seasonal historical & current Data from BQ
+    try:
+        df_historical_seasonal = get_seasonal_historical_task(project_id, dataset_historical)
+        print("Seasonal historical data loaded successfully.")
+    except Exception as e:
+        print(f"Error in get_seasonal_historical_task: {e}")
 
-    # Train + Predict
-    pred_temp = train_and_predict(df_historical_seasonal, df_current_bq)
+    try:
+      df_current_bq = extract_current_from_bq_task(project_id, dataset_month, table_current)
+      print("Current data from BigQuery loaded successfully.")
+    except Exception as e:
+        print(f"Error in extract_current_from_bq_task: {e}")
+
+    # Transform historical & current
+    try:
+        df_trans_historical = transform_historical_task(df_historical_seasonal)
+        df_trans_current = transform_current_task(df_current_bq)
+        print("Data transformation completed successfully.")
+        print(df_trans_historical.head())
+        print(df_current_bq.head())
+    except Exception as e:
+        print(f"Error in transform_task: {e}")
+
+    # Train & Predict
+    pred_temp = train_and_predict_task(df_trans_historical, df_trans_current)
 
     # Load prediction to BQ
-    load_prediction_to_bq(pred_temp, project_id, dataset_prediction, table_prediction)
+    load_prediction_to_bq_task(pred_temp, project_id, dataset_prediction, table_prediction)
 
 # --------
 # Run Flow
@@ -235,4 +265,4 @@ def weather_pipeline_flow(config_path: str):
 
 if __name__ == "__main__":
     weather_pipeline_flow("/content/drive/MyDrive/elt_pipeline_weather_forecast/config.yaml")
-    weather_pipeline_flow.visualize(filename="/content/drive/MyDrive/elt_weather_pipeline_dag.png")
+

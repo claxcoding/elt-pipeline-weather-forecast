@@ -2,7 +2,6 @@
 import matplotlib.pyplot as plt
 
 def visualize_current_prediction(df_trans_current, pred_temp):
-
     # Display current input features and predicted temperature.
     current = df_trans_current.iloc[0]  # Assuming 1 row
     print("Current weather input:")
@@ -33,7 +32,6 @@ def visualize_current_prediction(df_trans_current, pred_temp):
     plt.show()
 
 def plot_predictions_over_time(dates, actual, predicted):
-
     # Plot predicted vs actual temperature over time.
     plt.figure(figsize=(12,6))
     plt.plot(dates, actual, label='Actual Temperature', linewidth=2)

@@ -27,4 +27,3 @@ This project utilizes the following platforms and services:
 - Google Colab: For interactive development, coding, and experimentation.
 - Google Cloud Platform (BigQuery): For data storage and processing.
 - Open-Meteo API: For fetching weather data.
-
