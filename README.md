@@ -181,7 +181,7 @@ After completion, you can:
 
 - Explore the predictions stored in your **BigQuery dataset** `pred_temp`
 - Review **Prefect task logs** and flow run summary for orchestration insights
-- Analyze generated **graphs and visualizations** directly in the notebook 
+- Analyze generated **graphs and visualizations** directly in the notebook
 
 ---
 
@@ -220,7 +220,7 @@ After completion, you can:
 - Google Cloud credentials (service account with BigQuery permissions)
 - Jupyter Notebook or Google Colab
 - Prefect 3.5.0
-- Dependencied are installed while running the whole Notebook:
+- Dependencies are installed while running the whole Notebook:
 
 ```bash
 !pip install -r /content/drive/MyDrive/elt_pipeline_weather_forecast/requirements.txt
@@ -252,7 +252,7 @@ This project is actively being expanded to improve automation, portability, and 
 ### Data & Analytics
 - Create automated dashboards using PowerBI for visualization
 
-**Goal:**  
+**Goal:**
 A reproducible, automated ELT pipeline that collects, transforms, and predicts short-term weather data with minimal manual intervention, while providing actionable insights and easy scalability.
 
 ---
