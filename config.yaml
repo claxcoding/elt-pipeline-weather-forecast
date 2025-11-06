@@ -36,8 +36,8 @@ params_historical:
   timezone: Europe/Berlin
 project:
   dataset_historical: elt_weather_dataset_historical_siegburg_2017_2024
-  dataset_month: elt_weather_dataset_siegburg_october_2025
-  dataset_prediction: elt_weather_dataset_prediction_siegburg_october_2025
+  dataset_month: elt_weather_dataset_siegburg_november_2025
+  dataset_prediction: elt_weather_dataset_prediction_siegburg_november_2025
   project_id: elt-siegburg-weather-forecast
   table_8h: elt_weather_8h_table_{timestamp}
   table_historical: elt_weather_table_historical_siegburg_2017

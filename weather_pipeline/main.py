@@ -33,13 +33,13 @@ def create_table_task(project_id: str, dataset_id: str, table_id: str):
     return create_table(project_id, dataset_id, table_id)
 
 
-@task
+@task(retries=3, retry_delay_seconds=10)
 def fetch_historical_task(config: dict):
     historical_data_dict, historical_df_dict = fetch_historical_weather()
     return historical_data_dict, historical_df_dict
 
 
-@task
+@task(retries=3, retry_delay_seconds=10)
 def fetch_current_task(url_current: str):
     return api_fetch_url(url_current)
 

@@ -3,8 +3,8 @@
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 
-The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of demonstrating a **reproducible data engineering workflow**.
-Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
+The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of demonstrating a **reproducible, orchestrated data engineering workflow**.
+Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like containerization.
 
 ---
 
@@ -35,10 +35,10 @@ This orchestration makes the pipeline **modular, reproducible, and maintainable*
 
 ## Tools and Technologies Used
 
-- **Google Colab**: Interactive environment for development, experimentation, and running Python code.
 - **Google Cloud Platform (GCP)**: Provides the cloud infrastructure for this project, including **BigQuery** for storing and querying large weather datasets.
+- **Google Colab**: Interactive environment for development, experimentation, and running Python code.
 - **Prefect 3.5**: Orchestration framework for defining tasks and flows, managing dependencies, and visualizing the DAG.
-- **Python Libraries**: `pandas`, `numpy`, `scikit-learn` for data processing and machine learning.
+- **Python Libraries**: `pandas`, `numpy`, `scikit-learn`, `matplotlib` for data processing, machine learning and visualizing data.
 - **Graphviz**: Visualization library used to generate DAG diagrams of the pipeline tasks.
 
 This combination of tools ensures an efficient, scalable, and cloud-native approach to building the weather forecasting pipeline.
@@ -134,48 +134,6 @@ Each step is implemented as a **Prefect @task**, managed within a central **flow
 The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.
 The dependency graph of the pipeline is visualized using **Graphviz**. The following DAG shows the Prefect-orchestrated workflow of the weather forecasting pipeline:
 
-
----
-
-## ELT Process
-
-This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.
-Each step is implemented as a **Prefect @task**, managed within a central **flow**, allowing for dependency control, retry policies, and clear monitoring through DAG visualization.
-
-### 1. Extract
-- Fetches historical weather data (2017–2024) and current conditions using Open-Meteo’s REST API.
-- Tasks handle both **historical** and **current** API calls separately for modularity.
-- Stores raw JSON responses in memory and converts them to structured Pandas DataFrames.
-- Automatically retries API calls if temporary connection errors occur (managed by Prefect).
-
-### 2. Load
-- Loads raw weather data into **Google BigQuery**, storing each year’s data in a separate table.
-- Data loading is orchestrated so that BigQuery tables are created before loading occurs.
-- Uses the `google-cloud-bigquery` Python client for seamless integration with GCP.
-
-### 3. Transform
-- Cleans and formats raw weather data into consistent schemas.
-- Performs **feature engineering** to create columns such as:
-  - `temperature`, `rel_humidity`, `precipitation`, `pressure`, `wind_speed`, `wind_direction`
-- Merges historical and current data to prepare model-ready features.
-- Executed only after successful loading, as enforced by Prefect task dependencies.
-
-### 4. Model (Predict)
-- Trains a **Random Forest Regressor** using historical October data.
-- Generates hourly temperature predictions for the current period.
-- The **ML Stage** sits at the center of the DAG, connecting data transformation with prediction output.
-- Prefect ensures the model only trains after all required data transformations are complete.
-
-### 5. Store
-- Saves prediction results back to BigQuery for analytics or dashboarding.
-- Acts as the final task in the flow, marking successful pipeline completion.
-
----
-
-### Orchestration and Visualization
-The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.
-The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
-
 <p align="center">
   <img src="dag_weather_forecast_pipeline.png" alt="Weather Forecasting ELT Pipeline DAG" width="700"/>
 </p>
@@ -186,7 +144,7 @@ The dependency graph of the pipeline is visualized using **Graphviz**, which gen
 
 ### 1. Set your Google Cloud Project ID
 - Before running the notebook, open `elt_pipeline_weather.ipynb` and locate the configuration dictionary.
-- Replace the `project_id` value with your own Google Cloud project ID and `dataset_month` to the current month, for example:
+- Replace the `project_id` value with your own Google Cloud project ID, `dataset_month` and `dataset_prediction` to the current month, for example:
 
 ```python
 config_data = {
@@ -194,22 +152,36 @@ config_data = {
         "project_id": "your-gcp-project-id",
         "dataset_historical": "elt_weather_dataset_historical_siegburg_2017_2024",
         "table_historical": "elt_weather_table_historical_siegburg_2017",
-        "dataset_month": "elt_weather_dataset_siegburg_october_2025",
+        "dataset_month": "elt_weather_dataset_siegburg_november_2025",
         "table_8h": "elt_weather_8h_table_{timestamp}",
-        # ... other config values ...
-    }
+        "dataset_prediction": "elt_weather_dataset_prediction_siegburg_november_2025",
+    } # ... other config values ...
 }
 ```
 
 ### 2. Run the Notebook
+
 #### Execute all cells sequentially. This will:
-- Fetch historical and current weather data
-- Load data into BigQuery
-- Run transformations and train a Random Forest model
-- Store prediction results back into BigQuery
+
+- Orchestrate the **ELT + ML workflow** using **Prefect 3.5**
+- Fetch historical and current weather data from the **Open-Meteo API**
+- Load raw data into **BigQuery**, creating tables as needed
+- Run transformations and train a **Random Forest Regressor** on historical data
+- Store prediction results back into **BigQuery**
+- Produce in-notebook outputs including:
+  - `pred_temp` – DataFrame of predicted temperature
+  - `load_prediction_to_bq` – Confirmation of successful BigQuery load
+  - Visualizations, such as:
+    - Features and predicted temperature
+    - Predicted vs. actual temperature over time
 
 ### 3. View Results
-After completion, explore the predictions stored in your BigQuery dataset or extend the project with visualization tools.
+
+After completion, you can:
+
+- Explore the predictions stored in your **BigQuery dataset** `pred_temp`
+- Review **Prefect task logs** and flow run summary for orchestration insights
+- Analyze generated **graphs and visualizations** directly in the notebook 
 
 ---
 
@@ -219,18 +191,17 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 ### `gcp_utils/`
 - `create_dataset.py` – Create BigQuery datasets
 - `create_table.py` – Create BigQuery tables
-- `jobtables.py` – Submit query jobs to BigQuery
 - `manage_gcp.py` – CLI runner for GCP utilities
 
 ### `weather_pipeline/`
 - `fetch_utils.py` – Handle API requests and data formatting
-- `load_utils.py` – Load Pandas DataFrames to BigQuery, and convert NumPy arrays to DataFrames
 - `load_config.py` – Read config from YAML file
+- `load_utils.py` – Load Pandas DataFrames to BigQuery, and convert NumPy arrays to DataFrames
 - `main.py` – Central runner script for the pipeline
 - `predictor_utils.py` – Train and evaluate prediction models
 - `query_utils.py` – Construct and run SQL queries
 - `transform_utils.py` – Feature engineering and cleaning
-- `visualization_utils.py` – Plotting and metrics
+- `visualization_utils.py` – Plotting predictions and features
 
 ---
 
@@ -262,19 +233,27 @@ After completion, explore the predictions stored in your BigQuery dataset or ext
 This project is actively being expanded to improve automation, portability, and predictive capabilities:
 
 ### Orchestration
-- Add workflow orchestration with **Airflow**
-- Schedule regular data updates and monitor pipeline runs
+- Add workflow orchestration with **Airflow** to complement Prefect
+- Schedule regular data updates (daily/hourly) and monitor pipeline runs
+- Implement alerting and notifications for failed tasks or delayed executions
+- Introduce versioning for data and model outputs to ensure reproducibility
 
 ### Dockerization
 - Containerize the pipeline using **Docker** for reproducible environments
 - Facilitate deployment across different machines or cloud platforms
+- Create pre-configured images with all dependencies to simplify onboarding
 
 ### Machine Learning
-- Integrate a lightweight ML component to generate **1-hour weather forecasts**
+- Integrate a deeper ML component to generate **1-hour weather forecasts**
+- Explore additional predictive models (e.g., Gradient Boosting, XGBoost) for improved accuracy
 - Continuously retrain and evaluate the model as new data arrives
+- Generate model performance reports and feature importance visualizations for transparency
 
-**Goal:**
-A reproducible, automated ELT pipeline that collects, transforms, and predicts short-term weather data with minimal manual intervention.
+### Data & Analytics
+- Create automated dashboards using PowerBI for visualization
+
+**Goal:**  
+A reproducible, automated ELT pipeline that collects, transforms, and predicts short-term weather data with minimal manual intervention, while providing actionable insights and easy scalability.
 
 ---
 
