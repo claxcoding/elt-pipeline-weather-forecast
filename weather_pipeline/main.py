@@ -253,10 +253,10 @@ def weather_pipeline_flow(config_path: str):
     except Exception as e:
         print(f"Error in transform_task: {e}")
 
-    # Train & Predict
+    # Train, predict and visualize
     pred_temp = train_and_predict_task(df_trans_historical, df_trans_current)
 
-    # Load prediction to BQ
+    # Load Prediction to BQ
     load_prediction_to_bq_task(pred_temp, project_id, dataset_prediction, table_prediction)
 
 # --------

@@ -3,7 +3,7 @@
 
 This project implements a **modular, scalable end-to-end ELT (Extract, Load, Transform)** pipeline for **weather forecasting** using **Google Colab Python** and **Google Cloud Platform (BigQuery)**. It automates the process of collecting, storing, transforming, and modeling weather data to predict **hourly temperatures** in **Siegburg, Germany**.
 
-The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of demonstrating a **reproducible data engineering workflow**.  
+The weather forecasting is at this stage in a simplified form to represent the function of the pipeline. In future, there may be a deeper focus on more complex machine learning models, but for now, it serves the purpose of demonstrating a **reproducible data engineering workflow**.
 Data is sourced from the **[Open-Meteo API](https://open-meteo.com/)** and processed into a structured format to support **machine learning-based forecasting**. The pipeline is built for experimentation and can be scaled with additional features like orchestration or containerization.
 
 ---
@@ -97,7 +97,7 @@ weather-forecasting-elt/
 
 ## ELT Process
 
-This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.  
+This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.
 Each step is implemented as a **Prefect @task**, managed within a central **flow**, allowing for dependency control, retry policies, and clear monitoring through DAG visualization.
 
 ### 1. Extract
@@ -131,7 +131,7 @@ Each step is implemented as a **Prefect @task**, managed within a central **flow
 ---
 
 ### Orchestration and Visualization
-The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
+The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.
 The dependency graph of the pipeline is visualized using **Graphviz**. The following DAG shows the Prefect-orchestrated workflow of the weather forecasting pipeline:
 
 
@@ -139,7 +139,7 @@ The dependency graph of the pipeline is visualized using **Graphviz**. The follo
 
 ## ELT Process
 
-This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.  
+This project follows a structured **ELT (Extract, Load, Transform)** workflow, fully orchestrated with **Prefect 3.5**.
 Each step is implemented as a **Prefect @task**, managed within a central **flow**, allowing for dependency control, retry policies, and clear monitoring through DAG visualization.
 
 ### 1. Extract
@@ -173,7 +173,7 @@ Each step is implemented as a **Prefect @task**, managed within a central **flow
 ---
 
 ### Orchestration and Visualization
-The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.  
+The entire ELT process is orchestrated through **Prefect 3.5**, ensuring tasks execute in the correct order and enabling recovery in case of failures.
 The dependency graph of the pipeline is visualized using **Graphviz**, which generates the file:
 
 <p align="center">

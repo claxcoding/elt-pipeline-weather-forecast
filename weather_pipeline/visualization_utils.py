@@ -10,9 +10,10 @@ def visualize_current_prediction(df_trans_current, pred_temp):
 
     # Plot weather features + predicted temp
     feature_values = current[['rel_humidity', 'precip', 'pressure', 'wind_speed', 'wind_direction']]
-
+    feature_labels = ['Relative Humidity [%]', 'Precipitation [mm]', 'Surface Pressure [hPa]', 'Wind Speed [km/h]', 'Wind Direction [°]']
+    
     plt.figure(figsize=(10, 5))
-    bars = plt.bar(feature_values.index, feature_values.values, color='skyblue')
+    bars = plt.bar(feature_labels, feature_values.values, color='skyblue')
     plt.title("Current Weather Features")
     plt.ylabel("Value")
     plt.xticks(rotation=45)
